@@ -1,0 +1,43 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.1.2'
+        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
+        classpath 'org.codehaus.groovy:gradle-groovy-android-plugin:0.3.10'
+    }
+}
+
+ext {
+    runningOnJenkins = System.getenv('JENKINS_URL') != null
+    nexusReleasesRepository = getEnvOrProperty('NEXUS_RELEASES_REPOSITORY')
+    nexusSnapshotsRepository = getEnvOrProperty('NEXUS_SNAPSHOTS_REPOSITORY')
+    nexusUsername = getEnvOrProperty('NEXUS_USERNAME')
+    nexusPassword = getEnvOrProperty('NEXUS_PASSWORD')
+
+    compileSdkVersion = 23
+    buildToolsVersion = '23.0.3'
+    targetSdkVersion = 23
+
+    supportVersion = '24.0.0'
+    daggerVersion = '2.4'
+    retrofitVersion = '2.1.0'
+    butterknifeVersion = '8.0.1'
+}
+
+allprojects {
+    repositories {
+        jcenter()
+        maven { url "https://raw.github.com/laenger/maven-releases/master/releases" }
+        maven { url "https://raw.github.com/laenger/maven-releases/master/snapshots" }
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
+
+def getEnvOrProperty(String name) {
+    return System.getenv(name) ?: project.hasProperty(name) ? project[name] : '';
+}

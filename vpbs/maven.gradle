@@ -1,0 +1,27 @@
+apply plugin: 'maven'
+
+android.libraryVariants.all { variant ->
+    task("upload${variant.name.capitalize()}Archives", type: Upload, dependsOn: "assemble${variant.name.capitalize()}") {
+
+        def Configuration variantConfiguration = project.configurations.create("${variant.name}Archives")
+        variant.outputs.each { output ->
+            project.artifacts.add(variantConfiguration.name, file(output.outputFile))
+        }
+        configuration = variantConfiguration
+
+        repositories.mavenDeployer {
+            repository(url: nexusReleasesRepository) { authentication(userName: nexusUsername, password: nexusPassword) }
+            snapshotRepository(url: nexusSnapshotsRepository) { authentication(userName: nexusUsername, password: nexusPassword) }
+
+            pom.groupId = project.group
+            pom.artifactId = project.name
+            pom.version = android.defaultConfig.versionName
+            pom.packaging = 'aar'
+
+            pom.project {
+                name project.description
+            }
+        }
+
+    }
+}

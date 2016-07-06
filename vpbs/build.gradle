@@ -1,0 +1,51 @@
+apply plugin: 'com.android.library'
+
+description = 'Android BottomSheetBehavior with ViewPager support'
+group = 'biz.laenger.android'
+
+android {
+    compileSdkVersion rootProject.compileSdkVersion
+    buildToolsVersion rootProject.buildToolsVersion
+    defaultPublishConfig 'debug'
+    publishNonDefault true
+
+    defaultConfig {
+        minSdkVersion 8
+        targetSdkVersion rootProject.targetSdkVersion
+        versionName '0.0.1-SNAPSHOT'
+    }
+
+    buildTypes {
+        release {
+        }
+        debug {
+        }
+    }
+
+    libraryVariants.all { variant ->
+        variant.outputs.each { output ->
+            def outputFile = output.outputFile
+            if (outputFile != null && outputFile.name.endsWith('.aar')) {
+                def fileName = "${project.name}_${android.defaultConfig.versionName}_${buildVersionSuffix()}-${variant.buildType.name}.aar"
+                output.outputFile = new File(outputFile.parent, fileName)
+            }
+        }
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+}
+
+dependencies {
+    compile "com.android.support:design:${supportVersion}"
+}
+
+def buildVersionSuffix() {
+    if (runningOnJenkins) {
+        return "${System.getenv('BUILD_NUMBER').trim()}_${System.getenv('GIT_COMMIT').subSequence(0, 6).trim()}"
+    }
+    return 'local'
+}
+
+apply from: 'maven.gradle'
