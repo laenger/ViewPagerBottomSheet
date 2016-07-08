@@ -1,0 +1,37 @@
+apply plugin: 'com.android.application'
+apply plugin: 'com.neenbedankt.android-apt'
+
+android {
+    compileSdkVersion rootProject.compileSdkVersion
+    buildToolsVersion rootProject.buildToolsVersion
+
+    defaultConfig {
+        applicationId 'biz.laenger.android.vpbs.example'
+        minSdkVersion 21
+        targetSdkVersion rootProject.targetSdkVersion
+        versionCode 1
+        versionName '1.0.0'
+
+        testHandleProfiling true
+        testFunctionalTest true
+    }
+
+    buildTypes {
+        release {
+        }
+        debug {
+        }
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+}
+
+dependencies {
+    compile "com.android.support:design:${supportVersion}"
+    compile project(path: ':vpbs', configuration: 'debug')
+
+    compile "com.jakewharton:butterknife:${butterknifeVersion}"
+    apt "com.jakewharton:butterknife-compiler:${butterknifeVersion}"
+}

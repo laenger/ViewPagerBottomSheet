@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <string name="app_name">ViewPagerBottomSheet Example</string>
+
+    <string name="tab_recycler">recycler</string>
+    <string name="tab_nested_scroll">nested</string>
+    <string name="tab_view_pager">viewpager</string>
+
+    <string name="bottom_sheet_title">Bottom Sheet</string>
+</resources>

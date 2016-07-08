@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <color name="colorPrimary">@color/laengerPrimary</color>
+    <color name="colorPrimaryDark">@color/laengerPrimaryDark</color>
+    <color name="colorAccent">@color/laengerAccent</color>
+
+    <color name="laengerPrimary">#1B1357</color>
+    <color name="laengerPrimaryDark">#14003C</color>
+    <color name="laengerAccent">#E6E6E6</color>
+</resources>

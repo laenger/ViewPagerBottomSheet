@@ -5,7 +5,6 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:2.1.2'
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
-        classpath 'org.codehaus.groovy:gradle-groovy-android-plugin:0.3.10'
     }
 }
 
@@ -21,8 +20,6 @@ ext {
     targetSdkVersion = 23
 
     supportVersion = '24.0.0'
-    daggerVersion = '2.4'
-    retrofitVersion = '2.1.0'
     butterknifeVersion = '8.0.1'
 }
 

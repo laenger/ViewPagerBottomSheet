@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="false"
+    tools:context=".MainActivity">
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/appbar"
+        style="@style/MainAppBarStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            style="@style/MainToolbarStyle"
+            android:layout_width="match_parent"
+            app:layout_scrollFlags="enterAlways|snap" />
+
+        <android.support.design.widget.TabLayout
+            android:id="@+id/tabs"
+            style="@style/MainTabLayoutStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_scrollFlags="enterAlways|snap" />
+
+    </android.support.design.widget.AppBarLayout>
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/viewpager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingBottom="?attr/actionBarSize"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+
+    <!-- Bottom Sheet -->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?attr/colorBackgroundFloating"
+        android:elevation="16dp"
+        android:orientation="vertical"
+        app:behavior_peekHeight="?attr/actionBarSize"
+        app:layout_behavior="@string/view_pager_bottom_sheet_behavior">
+
+        <android.support.design.widget.AppBarLayout
+            android:id="@+id/bottom_sheet_appbar"
+            style="@style/BottomSheetAppBarStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/bottom_sheet_toolbar"
+                style="@style/BottomSheetToolbarStyle"
+                android:layout_width="match_parent" />
+
+            <android.support.design.widget.TabLayout
+                android:id="@+id/bottom_sheet_tabs"
+                style="@style/BottomSheetTabLayoutStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </android.support.design.widget.AppBarLayout>
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/bottom_sheet_viewpager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </LinearLayout>
+
+</android.support.design.widget.CoordinatorLayout>
