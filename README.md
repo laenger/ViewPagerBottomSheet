@@ -36,3 +36,7 @@ Setup any nested `ViewPager` inside the bottom sheet:
 BottomSheetUtils.setupViewPager(bottomSheetViewPager)
 ```
 (This also works when the ViewPager _is_ the bottom sheet view and for further nested ViewPagers)
+
+## How does this work?
+
+`ViewPagerBottomSheetBehavior` is essentially identical to the original `BottomSheetBehavior` from the Design Support Library but adds important details: ViewPagers are now properly handled when finding the scrolling child, and this reference can be updated on ViewPager page changes. See the key diff in this commit: [2775715](https://github.com/laenger/ViewPagerBottomSheet/commit/277571585500b8c1ed4ed444a5bd250b981c47fc)
