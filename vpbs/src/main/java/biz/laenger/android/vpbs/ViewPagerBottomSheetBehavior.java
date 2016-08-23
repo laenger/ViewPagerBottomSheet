@@ -35,11 +35,13 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPagerUtils;
 import android.support.v4.widget.ViewDragHelper;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -71,8 +73,10 @@ public class ViewPagerBottomSheetBehavior<V extends View> extends CoordinatorLay
          * Called when the bottom sheet is being dragged.
          *
          * @param bottomSheet The bottom sheet view.
-         * @param slideOffset The new offset of this bottom sheet within its range, from 0 to 1
-         *                    when it is moving upward, and from 0 to -1 when it moving downward.
+         * @param slideOffset The new offset of this bottom sheet within [-1,1] range. Offset
+         *                    increases as this bottom sheet is moving upward. From 0 to 1 the sheet
+         *                    is between collapsed and expanded states and from -1 to 0 it is
+         *                    between hidden and collapsed states.
          */
         public abstract void onSlide(@NonNull View bottomSheet, float slideOffset);
     }
@@ -107,6 +111,14 @@ public class ViewPagerBottomSheetBehavior<V extends View> extends CoordinatorLay
     @Retention(RetentionPolicy.SOURCE)
     public @interface State {}
 
+    /**
+     * Peek at the 16:9 ratio keyline of its parent.
+     *
+     * <p>This can be used as a parameter for {@link #setPeekHeight(int)}.
+     * {@link #getPeekHeight()} will return this when the value is set.</p>
+     */
+    public static final int PEEK_HEIGHT_AUTO = -1;
+
     private static final float HIDE_THRESHOLD = 0.5f;
 
     private static final float HIDE_FRICTION = 0.1f;
@@ -114,6 +126,10 @@ public class ViewPagerBottomSheetBehavior<V extends View> extends CoordinatorLay
     private float mMaximumVelocity;
 
     private int mPeekHeight;
+
+    private boolean mPeekHeightAuto;
+
+    private int mPeekHeightMin;
 
     private int mMinOffset;
 
@@ -151,13 +167,13 @@ public class ViewPagerBottomSheetBehavior<V extends View> extends CoordinatorLay
     private boolean mTouchingScrollingChild;
 
     /**
-     * Default constructor for instantiating BottomSheetBehaviors.
+     * Default constructor for instantiating ViewPagerBottomSheetBehaviors.
      */
     public ViewPagerBottomSheetBehavior() {
     }
 
     /**
-     * Default constructor for inflating BottomSheetBehaviors from layout.
+     * Default constructor for inflating ViewPagerBottomSheetBehaviors from layout.
      *
      * @param context The {@link Context}.
      * @param attrs   The {@link AttributeSet}.
@@ -166,8 +182,13 @@ public class ViewPagerBottomSheetBehavior<V extends View> extends CoordinatorLay
         super(context, attrs);
         TypedArray a = context.obtainStyledAttributes(attrs,
                 R.styleable.BottomSheetBehavior_Layout);
-        setPeekHeight(a.getDimensionPixelSize(
-                R.styleable.BottomSheetBehavior_Layout_behavior_peekHeight, 0));
+        TypedValue value = a.peekValue(R.styleable.BottomSheetBehavior_Layout_behavior_peekHeight);
+        if (value != null && value.data == PEEK_HEIGHT_AUTO) {
+            setPeekHeight(value.data);
+        } else {
+            setPeekHeight(a.getDimensionPixelSize(
+                    R.styleable.BottomSheetBehavior_Layout_behavior_peekHeight, PEEK_HEIGHT_AUTO));
+        }
         setHideable(a.getBoolean(R.styleable.BottomSheetBehavior_Layout_behavior_hideable, false));
         setSkipCollapsed(a.getBoolean(R.styleable.BottomSheetBehavior_Layout_behavior_skipCollapsed,
                 false));
@@ -203,8 +224,18 @@ public class ViewPagerBottomSheetBehavior<V extends View> extends CoordinatorLay
         parent.onLayoutChild(child, layoutDirection);
         // Offset the bottom sheet
         mParentHeight = parent.getHeight();
+        int peekHeight;
+        if (mPeekHeightAuto) {
+            if (mPeekHeightMin == 0) {
+                mPeekHeightMin = parent.getResources().getDimensionPixelSize(
+                        R.dimen.design_bottom_sheet_peek_height_min);
+            }
+            peekHeight = Math.max(mPeekHeightMin, mParentHeight - parent.getWidth() * 9 / 16);
+        } else {
+            peekHeight = mPeekHeight;
+        }
         mMinOffset = Math.max(0, mParentHeight - child.getHeight());
-        mMaxOffset = Math.max(mParentHeight - mPeekHeight, mMinOffset);
+        mMaxOffset = Math.max(mParentHeight - peekHeight, mMinOffset);
         if (mState == STATE_EXPANDED) {
             ViewCompat.offsetTopAndBottom(child, mMinOffset);
         } else if (mHideable && mState == STATE_HIDDEN) {
@@ -302,7 +333,7 @@ public class ViewPagerBottomSheetBehavior<V extends View> extends CoordinatorLay
 
     @Override
     public boolean onStartNestedScroll(CoordinatorLayout coordinatorLayout, V child,
-                                       View directTargetChild, View target, int nestedScrollAxes) {
+            View directTargetChild, View target, int nestedScrollAxes) {
         mLastNestedScrollDy = 0;
         mNestedScrolled = false;
         return (nestedScrollAxes & ViewCompat.SCROLL_AXIS_VERTICAL) != 0;
@@ -310,7 +341,7 @@ public class ViewPagerBottomSheetBehavior<V extends View> extends CoordinatorLay
 
     @Override
     public void onNestedPreScroll(CoordinatorLayout coordinatorLayout, V child, View target, int dx,
-                                  int dy, int[] consumed) {
+            int dy, int[] consumed) {
         View scrollingChild = mNestedScrollingChildRef.get();
         if (target != scrollingChild) {
             return;
@@ -386,7 +417,7 @@ public class ViewPagerBottomSheetBehavior<V extends View> extends CoordinatorLay
 
     @Override
     public boolean onNestedPreFling(CoordinatorLayout coordinatorLayout, V child, View target,
-                                    float velocityX, float velocityY) {
+            float velocityX, float velocityY) {
         return target == mNestedScrollingChildRef.get() &&
                 (mState != STATE_EXPANDED ||
                         super.onNestedPreFling(coordinatorLayout, child, target,
@@ -401,22 +432,41 @@ public class ViewPagerBottomSheetBehavior<V extends View> extends CoordinatorLay
     /**
      * Sets the height of the bottom sheet when it is collapsed.
      *
-     * @param peekHeight The height of the collapsed bottom sheet in pixels.
+     * @param peekHeight The height of the collapsed bottom sheet in pixels, or
+     *                   {@link #PEEK_HEIGHT_AUTO} to configure the sheet to peek automatically
+     *                   at 16:9 ratio keyline.
      * @attr ref android.support.design.R.styleable#BottomSheetBehavior_Layout_behavior_peekHeight
      */
     public final void setPeekHeight(int peekHeight) {
-        mPeekHeight = Math.max(0, peekHeight);
-        mMaxOffset = mParentHeight - peekHeight;
+        boolean layout = false;
+        if (peekHeight == PEEK_HEIGHT_AUTO) {
+            if (!mPeekHeightAuto) {
+                mPeekHeightAuto = true;
+                layout = true;
+            }
+        } else if (mPeekHeightAuto || mPeekHeight != peekHeight) {
+            mPeekHeightAuto = false;
+            mPeekHeight = Math.max(0, peekHeight);
+            mMaxOffset = mParentHeight - peekHeight;
+            layout = true;
+        }
+        if (layout && mState == STATE_COLLAPSED && mViewRef != null) {
+            V view = mViewRef.get();
+            if (view != null) {
+                view.requestLayout();
+            }
+        }
     }
 
     /**
      * Gets the height of the bottom sheet when it is collapsed.
      *
-     * @return The height of the collapsed bottom sheet.
+     * @return The height of the collapsed bottom sheet in pixels, or {@link #PEEK_HEIGHT_AUTO}
+     *         if the sheet is configured to peek automatically at 16:9 ratio keyline
      * @attr ref android.support.design.R.styleable#BottomSheetBehavior_Layout_behavior_peekHeight
      */
     public final int getPeekHeight() {
-        return mPeekHeight;
+        return mPeekHeightAuto ? PEEK_HEIGHT_AUTO : mPeekHeight;
     }
 
     /**
@@ -477,7 +527,7 @@ public class ViewPagerBottomSheetBehavior<V extends View> extends CoordinatorLay
      * @param state One of {@link #STATE_COLLAPSED}, {@link #STATE_EXPANDED}, or
      *              {@link #STATE_HIDDEN}.
      */
-    public final void setState(@State int state) {
+    public final void setState(final @State int state) {
         if (state == mState) {
             return;
         }
@@ -489,23 +539,21 @@ public class ViewPagerBottomSheetBehavior<V extends View> extends CoordinatorLay
             }
             return;
         }
-        V child = mViewRef.get();
+        final V child = mViewRef.get();
         if (child == null) {
             return;
         }
-        int top;
-        if (state == STATE_COLLAPSED) {
-            top = mMaxOffset;
-        } else if (state == STATE_EXPANDED) {
-            top = mMinOffset;
-        } else if (mHideable && state == STATE_HIDDEN) {
-            top = mParentHeight;
+        // Start the animation; wait until a pending layout if there is one.
+        ViewParent parent = child.getParent();
+        if (parent != null && parent.isLayoutRequested() && ViewCompat.isAttachedToWindow(child)) {
+            child.post(new Runnable() {
+                @Override
+                public void run() {
+                    startSettlingAnimation(child, state);
+                }
+            });
         } else {
-            throw new IllegalArgumentException("Illegal state argument: " + state);
-        }
-        setStateInternal(STATE_SETTLING);
-        if (mViewDragHelper.smoothSlideViewTo(child, child.getLeft(), top)) {
-            ViewCompat.postOnAnimation(child, new SettleRunnable(child, state));
+            startSettlingAnimation(child, state);
         }
     }
 
@@ -577,6 +625,23 @@ public class ViewPagerBottomSheetBehavior<V extends View> extends CoordinatorLay
     private float getYVelocity() {
         mVelocityTracker.computeCurrentVelocity(1000, mMaximumVelocity);
         return VelocityTrackerCompat.getYVelocity(mVelocityTracker, mActivePointerId);
+    }
+
+    private void startSettlingAnimation(View child, int state) {
+        int top;
+        if (state == STATE_COLLAPSED) {
+            top = mMaxOffset;
+        } else if (state == STATE_EXPANDED) {
+            top = mMinOffset;
+        } else if (mHideable && state == STATE_HIDDEN) {
+            top = mParentHeight;
+        } else {
+            throw new IllegalArgumentException("Illegal state argument: " + state);
+        }
+        setStateInternal(STATE_SETTLING);
+        if (mViewDragHelper.smoothSlideViewTo(child, child.getLeft(), top)) {
+            ViewCompat.postOnAnimation(child, new SettleRunnable(child, state));
+        }
     }
 
     private final ViewDragHelper.Callback mDragCallback = new ViewDragHelper.Callback() {

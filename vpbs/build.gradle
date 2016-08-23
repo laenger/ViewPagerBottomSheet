@@ -10,9 +10,9 @@ android {
     publishNonDefault true
 
     defaultConfig {
-        minSdkVersion 8
+        minSdkVersion 9
         targetSdkVersion rootProject.targetSdkVersion
-        versionName '0.0.1-SNAPSHOT'
+        versionName '0.0.2-SNAPSHOT'
     }
 
     buildTypes {
