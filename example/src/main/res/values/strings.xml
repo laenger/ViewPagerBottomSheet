@@ -8,4 +8,5 @@
     <string name="tab_view_pager">viewpager</string>
 
     <string name="bottom_sheet_title">Bottom Sheet</string>
+    <string name="action_bottom_sheet_dialog">Bottom Sheet Dialog</string>
 </resources>

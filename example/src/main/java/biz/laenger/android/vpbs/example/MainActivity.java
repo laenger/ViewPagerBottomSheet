@@ -5,9 +5,12 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import biz.laenger.android.vpbs.BottomSheetUtils;
 import biz.laenger.android.vpbs.example.PagerAdapter.TabItem;
+import biz.laenger.android.vpbs.example.fragments.DialogFragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -45,6 +48,28 @@ public class MainActivity extends AppCompatActivity {
         bottomSheetViewPager.setAdapter(sectionsPagerAdapter);
         bottomSheetTabLayout.setupWithViewPager(bottomSheetViewPager);
         BottomSheetUtils.setupViewPager(bottomSheetViewPager);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_bottom_sheet_dialog:
+                showBottomSheetDialog();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void showBottomSheetDialog() {
+        final DialogFragment dialogFragment = new DialogFragment();
+        dialogFragment.show(getSupportFragmentManager(), dialogFragment.getTag());
     }
 
 }
