@@ -1,6 +1,6 @@
 # ViewPagerBottomSheet
 
-Use ViewPagers in Bottom Sheets!
+Use ViewPagers in Bottom Sheets and Bottom Sheet Dialogs!
 
 ## Example
 
@@ -22,7 +22,7 @@ Add the library to the dependencies:
 
 ```groovy
 dependencies {
-    compile "biz.laenger.android:vpbs:0.0.2"
+    compile "biz.laenger.android:vpbs:0.0.3"
 }
 ```
 
@@ -36,6 +36,28 @@ Setup any nested `ViewPager` inside the bottom sheet:
 BottomSheetUtils.setupViewPager(bottomSheetViewPager)
 ```
 (This also works when the ViewPager _is_ the bottom sheet view and for further nested ViewPagers)
+
+## Use with Bottom Sheet Dialogs
+
+Use `ViewPagerBottomSheetDialogFragment` as super-class and setup any `ViewPager` as follows:
+
+```java
+public class DialogFragment extends ViewPagerBottomSheetDialogFragment {
+    @Override
+    public void setupDialog(Dialog dialog, int style) {
+        super.setupDialog(dialog, style);
+        final View contentView = View.inflate(getContext(), R.layout.dialog_bottom_sheet, null);
+
+        ViewPager viewPager = (ViewPager) contentView.findViewById(R.id.viewpager);
+        // ...
+        BottomSheetUtils.setupViewPager(viewPager);
+
+        dialog.setContentView(contentView);
+    }
+}
+```
+
+![Example App](assets/dialog.gif)
 
 ## How does this work?
 
