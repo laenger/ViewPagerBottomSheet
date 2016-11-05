@@ -19,7 +19,7 @@ public final class ViewPagerBottomSheetDialog extends AppCompatDialog {
 
     private ViewPagerBottomSheetBehavior<FrameLayout> mBehavior;
 
-    private boolean mCancelable = true;
+    boolean mCancelable = true;
     private boolean mCanceledOnTouchOutside = true;
     private boolean mCanceledOnTouchOutsideSet;
 
@@ -35,7 +35,7 @@ public final class ViewPagerBottomSheetDialog extends AppCompatDialog {
     }
 
     protected ViewPagerBottomSheetDialog(@NonNull Context context, boolean cancelable,
-                                         OnCancelListener cancelListener) {
+            OnCancelListener cancelListener) {
         super(context, cancelable, cancelListener);
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         mCancelable = cancelable;
@@ -111,7 +111,7 @@ public final class ViewPagerBottomSheetDialog extends AppCompatDialog {
         return coordinator;
     }
 
-    private boolean shouldWindowCloseOnTouchOutside() {
+    boolean shouldWindowCloseOnTouchOutside() {
         if (!mCanceledOnTouchOutsideSet) {
             if (Build.VERSION.SDK_INT < 11) {
                 mCanceledOnTouchOutside = true;
@@ -145,9 +145,9 @@ public final class ViewPagerBottomSheetDialog extends AppCompatDialog {
             = new ViewPagerBottomSheetBehavior.BottomSheetCallback() {
         @Override
         public void onStateChanged(@NonNull View bottomSheet,
-                                   @ViewPagerBottomSheetBehavior.State int newState) {
+                @ViewPagerBottomSheetBehavior.State int newState) {
             if (newState == ViewPagerBottomSheetBehavior.STATE_HIDDEN) {
-                dismiss();
+                cancel();
             }
         }
 

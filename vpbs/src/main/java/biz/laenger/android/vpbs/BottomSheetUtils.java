@@ -19,7 +19,7 @@ public final class BottomSheetUtils {
         private final ViewPager viewPager;
         private final ViewPagerBottomSheetBehavior<View> behavior;
 
-        public BottomSheetViewPagerListener(ViewPager viewPager, View bottomSheetParent) {
+        private BottomSheetViewPagerListener(ViewPager viewPager, View bottomSheetParent) {
             this.viewPager = viewPager;
             this.behavior = ViewPagerBottomSheetBehavior.from(bottomSheetParent);
         }
