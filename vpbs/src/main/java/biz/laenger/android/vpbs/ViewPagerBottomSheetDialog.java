@@ -179,6 +179,9 @@ public final class ViewPagerBottomSheetDialog extends AppCompatDialog {
 
         @Override
         public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+//              /* You can use smth like this to close the dialog */
+//            if (slideOffset < -0.5)
+//                cancel();
         }
     };
 

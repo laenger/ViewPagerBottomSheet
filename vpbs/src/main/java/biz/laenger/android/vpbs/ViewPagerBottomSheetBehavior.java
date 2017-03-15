@@ -395,7 +395,7 @@ public class ViewPagerBottomSheetBehavior<V extends View> extends CoordinatorLay
         if (mLastNestedScrollDy > 0) {
             top = mMinOffset;
             targetState = STATE_EXPANDED;
-        } else if (mHideable && shouldHide(child, getYVelocity())) {
+        } else if (mHideable && shouldHide(child instanceof ViewPager ? child : child.getRootView(), getYVelocity())) {
             top = mParentHeight;
             targetState = STATE_HIDDEN;
         } else if (mLastNestedScrollDy == 0) {
@@ -408,8 +408,13 @@ public class ViewPagerBottomSheetBehavior<V extends View> extends CoordinatorLay
                 targetState = STATE_COLLAPSED;
             }
         } else {
-            top = mMaxOffset;
-            targetState = STATE_COLLAPSED;
+            if (child instanceof ViewPager) {
+                top = mMaxOffset;
+                targetState = STATE_COLLAPSED;
+            } else {
+                top = mMinOffset;
+                targetState = STATE_EXPANDED;
+            }
         }
         if (mViewDragHelper.smoothSlideViewTo(child, child.getLeft(), top)) {
             setStateInternal(STATE_SETTLING);
