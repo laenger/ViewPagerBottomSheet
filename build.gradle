@@ -1,10 +1,10 @@
 buildscript {
     repositories {
+        google()
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.3'
-        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
+        classpath 'com.android.tools.build:gradle:3.1.0-rc03'
     }
 }
 
@@ -15,16 +15,30 @@ ext {
     nexusUsername = getEnvOrProperty('NEXUS_USERNAME')
     nexusPassword = getEnvOrProperty('NEXUS_PASSWORD')
 
-    compileSdkVersion = 25
-    buildToolsVersion = '25.0.0'
-    targetSdkVersion = 25
+    developers = [
+            [
+                    id   : 'laenger',
+                    name : 'Christian Langer',
+                    email: 'mail@laenger.biz'
+            ]
+    ]
+    scm = [
+            connection         : 'scm:git:git@github.com:laenger/ViewPagerBottomSheet.git',
+            developerConnection: 'scm:git:git@github.com:laenger/ViewPagerBottomSheet.git',
+            url                : 'https://github.com/laenger/ViewPagerBottomSheet'
+    ]
 
-    supportVersion = '25.1.0'
-    butterknifeVersion = '8.4.0'
+    compileSdkVersion = 27
+    buildToolsVersion = '27.0.3'
+    targetSdkVersion = 27
+
+    supportVersion = '27.1.0'
+    butterknifeVersion = '8.8.1'
 }
 
 allprojects {
     repositories {
+        google()
         jcenter()
         maven { url "https://raw.github.com/laenger/maven-releases/master/releases" }
         maven { url "https://raw.github.com/laenger/maven-releases/master/snapshots" }

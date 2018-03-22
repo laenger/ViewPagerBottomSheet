@@ -1,7 +1,9 @@
 package biz.laenger.android.vpbs.example.fragments;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
@@ -21,6 +23,7 @@ public class DialogFragment extends ViewPagerBottomSheetDialogFragment {
     @BindView(R.id.bottom_sheet_tabs) TabLayout bottomSheetTabLayout;
     @BindView(R.id.bottom_sheet_viewpager) ViewPager bottomSheetViewPager;
 
+    @SuppressLint("RestrictedApi")
     @Override
     public void setupDialog(Dialog dialog, int style) {
         super.setupDialog(dialog, style);
@@ -44,7 +47,7 @@ public class DialogFragment extends ViewPagerBottomSheetDialogFragment {
 
         private final Context context;
 
-        public SimplePagerAdapter(Context context) {
+        SimplePagerAdapter(Context context) {
             this.context = context;
         }
 
@@ -59,19 +62,20 @@ public class DialogFragment extends ViewPagerBottomSheetDialogFragment {
         }
 
         @Override
-        public boolean isViewFromObject(View view, Object object) {
+        public boolean isViewFromObject(@NonNull View view, @NonNull Object object) {
             return object == view;
         }
 
+        @NonNull
         @Override
-        public Object instantiateItem(ViewGroup container, int position) {
+        public Object instantiateItem(@NonNull ViewGroup container, int position) {
             final View view = LayoutInflater.from(container.getContext()).inflate(R.layout.fragment_nested_scroll, container, false);
             container.addView(view);
             return view;
         }
 
         @Override
-        public void destroyItem(ViewGroup container, int position, Object object) {
+        public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
             container.removeView((View) object);
         }
 

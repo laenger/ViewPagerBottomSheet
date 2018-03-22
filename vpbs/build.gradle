@@ -1,7 +1,9 @@
 apply plugin: 'com.android.library'
 
-description = 'Android BottomSheetBehavior with ViewPager support'
 group = 'biz.laenger.android'
+archivesBaseName = 'vpbs'
+ext.title = 'ViewPagerBottomSheetBehavior'
+description = 'Android BottomSheetBehavior with ViewPager support'
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
@@ -10,7 +12,7 @@ android {
     publishNonDefault true
 
     defaultConfig {
-        minSdkVersion 9
+        minSdkVersion 14
         targetSdkVersion rootProject.targetSdkVersion
         versionName '0.0.4'
     }
@@ -22,23 +24,38 @@ android {
         }
     }
 
-    libraryVariants.all { variant ->
-        variant.outputs.each { output ->
-            def outputFile = output.outputFile
-            if (outputFile != null && outputFile.name.endsWith('.aar')) {
-                def fileName = "${project.name}_${android.defaultConfig.versionName}_${buildVersionSuffix()}-${variant.buildType.name}.aar"
-                output.outputFile = new File(outputFile.parent, fileName)
-            }
-        }
-    }
-
-    lintOptions {
-        abortOnError false
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 
 dependencies {
-    compile "com.android.support:design:${supportVersion}"
+    implementation "com.android.support:design:${supportVersion}"
+}
+
+android.libraryVariants.all { variant ->
+    renameLibraryVariantOutput(variant)
+
+    def sourcesJarTaskName = "generate${variant.name.capitalize()}SourcesJar"
+
+    task(sourcesJarTaskName, type: Jar) {
+        classifier = 'sources'
+        from variant.sourceSets*.java.srcDirs.flatten()
+        baseName = buildLibraryArchiveBaseName(variant)
+    }
+}
+
+def renameLibraryVariantOutput(variant) {
+    variant.outputs.all { output ->
+        if (outputFileName.endsWith('.aar')) {
+            outputFileName = "${buildLibraryArchiveBaseName(variant)}.aar"
+        }
+    }
+}
+
+def buildLibraryArchiveBaseName(variant) {
+    return "${project.name}_${android.defaultConfig.versionName}_${buildVersionSuffix()}-${variant.baseName}"
 }
 
 def buildVersionSuffix() {
@@ -48,4 +65,4 @@ def buildVersionSuffix() {
     return 'local'
 }
 
-apply from: 'maven.gradle'
+apply from: 'publish.gradle'
