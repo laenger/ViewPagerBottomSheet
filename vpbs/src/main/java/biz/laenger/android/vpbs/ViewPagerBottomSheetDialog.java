@@ -13,12 +13,14 @@ import android.support.v4.view.ViewCompat;
 import android.support.v4.view.accessibility.AccessibilityNodeInfoCompat;
 import android.support.v7.app.AppCompatDialog;
 import android.util.TypedValue;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 
-public final class ViewPagerBottomSheetDialog extends AppCompatDialog {
+public class ViewPagerBottomSheetDialog extends AppCompatDialog {
 
     private ViewPagerBottomSheetBehavior<FrameLayout> mBehavior;
 
@@ -52,8 +54,15 @@ public final class ViewPagerBottomSheetDialog extends AppCompatDialog {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getWindow().setLayout(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        Window window = getWindow();
+        if (window != null) {
+            if (Build.VERSION.SDK_INT >= 21) {
+                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            }
+            window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT);
+        }
     }
 
     @Override
@@ -78,6 +87,14 @@ public final class ViewPagerBottomSheetDialog extends AppCompatDialog {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        if (mBehavior != null) {
+            mBehavior.setState(ViewPagerBottomSheetBehavior.STATE_COLLAPSED);
+        }
+    }
+
+    @Override
     public void setCanceledOnTouchOutside(boolean cancel) {
         super.setCanceledOnTouchOutside(cancel);
         if (cancel && !mCancelable) {
@@ -88,8 +105,10 @@ public final class ViewPagerBottomSheetDialog extends AppCompatDialog {
     }
 
     private View wrapInBottomSheet(int layoutResId, View view, ViewGroup.LayoutParams params) {
-        final CoordinatorLayout coordinator = (CoordinatorLayout) View.inflate(getContext(),
+        final FrameLayout container = (FrameLayout) View.inflate(getContext(),
                 R.layout.design_view_pager_bottom_sheet_dialog, null);
+        final CoordinatorLayout coordinator =
+                (CoordinatorLayout) container.findViewById(R.id.coordinator);
         if (layoutResId != 0 && view == null) {
             view = getLayoutInflater().inflate(layoutResId, coordinator, false);
         }
@@ -134,7 +153,14 @@ public final class ViewPagerBottomSheetDialog extends AppCompatDialog {
                 return super.performAccessibilityAction(host, action, args);
             }
         });
-        return coordinator;
+        bottomSheet.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent event) {
+                // Consume the event and prevent it from falling through
+                return true;
+            }
+        });
+        return container;
     }
 
     boolean shouldWindowCloseOnTouchOutside() {
