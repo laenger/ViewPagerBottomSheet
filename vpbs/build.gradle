@@ -14,7 +14,7 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion rootProject.targetSdkVersion
-        versionName '0.0.4'
+        versionName '0.0.5'
     }
 
     buildTypes {
