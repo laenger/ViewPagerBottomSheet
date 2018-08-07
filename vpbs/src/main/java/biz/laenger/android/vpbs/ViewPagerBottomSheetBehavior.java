@@ -123,6 +123,8 @@ public class ViewPagerBottomSheetBehavior<V extends View> extends CoordinatorLay
 
     private static final float HIDE_FRICTION = 0.1f;
 
+    private float mMinimumVelocity;
+
     private float mMaximumVelocity;
 
     private int mPeekHeight;
@@ -145,8 +147,6 @@ public class ViewPagerBottomSheetBehavior<V extends View> extends CoordinatorLay
     ViewDragHelper mViewDragHelper;
 
     private boolean mIgnoreEvents;
-
-    private int mLastNestedScrollDy;
 
     private boolean mNestedScrolled;
 
@@ -195,6 +195,7 @@ public class ViewPagerBottomSheetBehavior<V extends View> extends CoordinatorLay
         a.recycle();
         ViewConfiguration configuration = ViewConfiguration.get(context);
         mMaximumVelocity = configuration.getScaledMaximumFlingVelocity();
+        mMinimumVelocity = configuration.getScaledMinimumFlingVelocity();
     }
 
     @Override
@@ -338,7 +339,6 @@ public class ViewPagerBottomSheetBehavior<V extends View> extends CoordinatorLay
     @Override
     public boolean onStartNestedScroll(CoordinatorLayout coordinatorLayout, V child,
             View directTargetChild, View target, int nestedScrollAxes) {
-        mLastNestedScrollDy = 0;
         mNestedScrolled = false;
         return (nestedScrollAxes & ViewCompat.SCROLL_AXIS_VERTICAL) != 0;
     }
@@ -376,7 +376,6 @@ public class ViewPagerBottomSheetBehavior<V extends View> extends CoordinatorLay
             }
         }
         dispatchOnSlide(child.getTop());
-        mLastNestedScrollDy = dy;
         mNestedScrolled = true;
     }
 
@@ -390,15 +389,24 @@ public class ViewPagerBottomSheetBehavior<V extends View> extends CoordinatorLay
                 || !mNestedScrolled) {
             return;
         }
+
+        mVelocityTracker.computeCurrentVelocity(1000, mMaximumVelocity);
+        float xVel = mVelocityTracker.getXVelocity(mActivePointerId);
+        float yVel = mVelocityTracker.getYVelocity(mActivePointerId);
+
         int top;
         int targetState;
-        if (mLastNestedScrollDy > 0) {
+        if (yVel < 0 && Math.abs(yVel) > mMinimumVelocity && Math.abs(yVel) > Math.abs(xVel)) {
             top = mMinOffset;
             targetState = STATE_EXPANDED;
-        } else if (mHideable && shouldHide(child, getYVelocity())) {
+        } else if (mHideable && shouldHide(child, yVel)) {
             top = mParentHeight;
             targetState = STATE_HIDDEN;
-        } else if (mLastNestedScrollDy == 0) {
+        } else if (yVel > 0 && Math.abs(yVel) > mMinimumVelocity && Math.abs(yVel) > Math.abs(xVel)) {
+            top = mMaxOffset;
+            targetState = STATE_COLLAPSED;
+        } else {
+            // not scrolling much, i.e. stationary
             int currentTop = child.getTop();
             if (Math.abs(currentTop - mMinOffset) < Math.abs(currentTop - mMaxOffset)) {
                 top = mMinOffset;
@@ -407,10 +415,8 @@ public class ViewPagerBottomSheetBehavior<V extends View> extends CoordinatorLay
                 top = mMaxOffset;
                 targetState = STATE_COLLAPSED;
             }
-        } else {
-            top = mMaxOffset;
-            targetState = STATE_COLLAPSED;
         }
+
         if (mViewDragHelper.smoothSlideViewTo(child, child.getLeft(), top)) {
             setStateInternal(STATE_SETTLING);
             ViewCompat.postOnAnimation(child, new SettleRunnable(child, targetState));
@@ -692,13 +698,17 @@ public class ViewPagerBottomSheetBehavior<V extends View> extends CoordinatorLay
         public void onViewReleased(View releasedChild, float xvel, float yvel) {
             int top;
             @State int targetState;
-            if (yvel < 0) { // Moving up
+            if (yvel < 0 && Math.abs(yvel) > mMinimumVelocity && Math.abs(yvel) > Math.abs(xvel)) {
                 top = mMinOffset;
                 targetState = STATE_EXPANDED;
             } else if (mHideable && shouldHide(releasedChild, yvel)) {
                 top = mParentHeight;
                 targetState = STATE_HIDDEN;
-            } else if (yvel == 0.f) {
+            } else if (yvel > 0 && Math.abs(yvel) > mMinimumVelocity && Math.abs(yvel) > Math.abs(xvel)) {
+                top = mMaxOffset;
+                targetState = STATE_COLLAPSED;
+            } else {
+                // not scrolling much, i.e. stationary
                 int currentTop = releasedChild.getTop();
                 if (Math.abs(currentTop - mMinOffset) < Math.abs(currentTop - mMaxOffset)) {
                     top = mMinOffset;
@@ -707,10 +717,8 @@ public class ViewPagerBottomSheetBehavior<V extends View> extends CoordinatorLay
                     top = mMaxOffset;
                     targetState = STATE_COLLAPSED;
                 }
-            } else {
-                top = mMaxOffset;
-                targetState = STATE_COLLAPSED;
             }
+
             if (mViewDragHelper.settleCapturedViewAt(releasedChild.getLeft(), top)) {
                 setStateInternal(STATE_SETTLING);
                 ViewCompat.postOnAnimation(releasedChild,
