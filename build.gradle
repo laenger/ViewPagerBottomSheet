@@ -4,7 +4,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.1.0-rc03'
+        classpath 'com.android.tools.build:gradle:3.4.1'
     }
 }
 
@@ -29,7 +29,6 @@ ext {
     ]
 
     compileSdkVersion = 27
-    buildToolsVersion = '27.0.3'
     targetSdkVersion = 27
 
     supportVersion = '27.1.0'

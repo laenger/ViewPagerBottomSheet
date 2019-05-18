@@ -7,7 +7,6 @@ description = 'Android BottomSheetBehavior with ViewPager support'
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
-    buildToolsVersion rootProject.buildToolsVersion
     defaultPublishConfig 'debug'
     publishNonDefault true
 
