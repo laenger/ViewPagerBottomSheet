@@ -3,10 +3,12 @@ package biz.laenger.android.vpbs.example.fragments;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.design.widget.TabLayout;
-import android.support.v4.view.ViewPager;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.NonNull;
+import com.google.android.material.tabs.TabLayout;
+
+import androidx.viewpager.widget.PagerAdapter;
+import androidx.viewpager.widget.ViewPager;
+import androidx.appcompat.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,7 +45,7 @@ public class DialogFragment extends ViewPagerBottomSheetDialogFragment {
         BottomSheetUtils.setupViewPager(bottomSheetViewPager);
     }
 
-    static class SimplePagerAdapter extends android.support.v4.view.PagerAdapter {
+    static class SimplePagerAdapter extends PagerAdapter {
 
         private final Context context;
 

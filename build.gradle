@@ -28,11 +28,11 @@ ext {
             url                : 'https://github.com/laenger/ViewPagerBottomSheet'
     ]
 
-    compileSdkVersion = 27
-    targetSdkVersion = 27
+    compileSdkVersion = 28
+    targetSdkVersion = 28
 
-    supportVersion = '27.1.0'
-    butterknifeVersion = '8.8.1'
+    materialVersion = '1.0.0'
+    butterknifeVersion = '10.1.0'
 }
 
 allprojects {

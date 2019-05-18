@@ -1,6 +1,8 @@
-package android.support.v4.view;
+package androidx.viewpager.widget;
 
 import android.view.View;
+
+import androidx.viewpager.widget.ViewPager;
 
 public class ViewPagerUtils {
 
