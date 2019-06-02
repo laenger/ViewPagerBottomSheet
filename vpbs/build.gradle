@@ -1,26 +1,11 @@
 apply plugin: 'com.android.library'
 
-group = 'biz.laenger.android'
-archivesBaseName = 'vpbs'
-ext.title = 'ViewPagerBottomSheetBehavior'
-description = 'Android BottomSheetBehavior with ViewPager support'
-
 android {
     compileSdkVersion rootProject.compileSdkVersion
-    defaultPublishConfig 'debug'
-    publishNonDefault true
-
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion rootProject.targetSdkVersion
-        versionName '0.0.5'
-    }
-
-    buildTypes {
-        release {
-        }
-        debug {
-        }
+        versionName '1.0.0'
     }
 
     compileOptions {
@@ -33,35 +18,5 @@ dependencies {
     implementation "com.google.android.material:material:${materialVersion}"
 }
 
-android.libraryVariants.all { variant ->
-    renameLibraryVariantOutput(variant)
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
 
-    def sourcesJarTaskName = "generate${variant.name.capitalize()}SourcesJar"
-
-    task(sourcesJarTaskName, type: Jar) {
-        classifier = 'sources'
-        from variant.sourceSets*.java.srcDirs.flatten()
-        baseName = buildLibraryArchiveBaseName(variant)
-    }
-}
-
-def renameLibraryVariantOutput(variant) {
-    variant.outputs.all { output ->
-        if (outputFileName.endsWith('.aar')) {
-            outputFileName = "${buildLibraryArchiveBaseName(variant)}.aar"
-        }
-    }
-}
-
-def buildLibraryArchiveBaseName(variant) {
-    return "${project.name}_${android.defaultConfig.versionName}_${buildVersionSuffix()}-${variant.baseName}"
-}
-
-def buildVersionSuffix() {
-    if (runningOnJenkins) {
-        return "${System.getenv('BUILD_NUMBER').trim()}_${System.getenv('GIT_COMMIT').subSequence(0, 6).trim()}"
-    }
-    return 'local'
-}
-
-apply from: 'publish.gradle'

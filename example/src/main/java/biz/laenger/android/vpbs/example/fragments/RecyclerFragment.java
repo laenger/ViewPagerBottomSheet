@@ -16,6 +16,8 @@ import biz.laenger.android.vpbs.example.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static androidx.recyclerview.widget.RecyclerView.VERTICAL;
+
 public class RecyclerFragment extends Fragment {
 
     @BindView(R.id.recycler_view) RecyclerView recyclerView;
@@ -31,7 +33,7 @@ public class RecyclerFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, true));
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), VERTICAL, true));
         recyclerView.setAdapter(new SimpleAdapter(getContext()));
     }
 

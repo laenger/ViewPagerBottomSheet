@@ -10,6 +10,15 @@ This repository features an example app that demonstrates nested ViewPagers insi
 
 ## Use for your project
 
+### AndroidX
+```groovy
+dependencies {
+    implementation "com.github.lizhuogui.android:viewpager-bottomsheet:1.0.0"
+}
+```
+
+### support library
+
 Add the maven repo url to your `build.gradle`:
 
 ```groovy
