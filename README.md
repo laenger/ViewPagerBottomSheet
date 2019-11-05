@@ -22,7 +22,7 @@ Add the library to the dependencies:
 
 ```groovy
 dependencies {
-    compile "biz.laenger.android:vpbs:0.0.5"
+    compile "biz.laenger.android:vpbs:0.0.6"
 }
 ```
 

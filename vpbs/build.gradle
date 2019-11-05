@@ -12,7 +12,7 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion rootProject.targetSdkVersion
-        versionName '0.0.6-SNAPSHOT'
+        versionName '0.0.6'
     }
 
     buildTypes {
