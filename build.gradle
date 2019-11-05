@@ -4,7 +4,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.1.0-rc03'
+        classpath 'com.android.tools.build:gradle:3.5.2'
     }
 }
 
@@ -28,20 +28,27 @@ ext {
             url                : 'https://github.com/laenger/ViewPagerBottomSheet'
     ]
 
-    compileSdkVersion = 27
-    buildToolsVersion = '27.0.3'
-    targetSdkVersion = 27
+    compileSdkVersion = 29
+    buildToolsVersion = '29.0.0'
+    targetSdkVersion = 29
 
-    supportVersion = '27.1.0'
+    supportVersion = '28.0.0'
     butterknifeVersion = '8.8.1'
 }
 
-allprojects {
+subprojects {
     repositories {
         google()
         jcenter()
         maven { url "https://raw.github.com/laenger/maven-releases/master/releases" }
         maven { url "https://raw.github.com/laenger/maven-releases/master/snapshots" }
+    }
+
+    apply from: "${rootDir}/config/common.gradle"
+    plugins.withId('com.android.library') {
+        afterEvaluate {
+            project.apply from: "${rootDir}/config/publish-android.gradle"
+        }
     }
 }
 

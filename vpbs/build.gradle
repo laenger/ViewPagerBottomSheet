@@ -8,13 +8,11 @@ description = 'Android BottomSheetBehavior with ViewPager support'
 android {
     compileSdkVersion rootProject.compileSdkVersion
     buildToolsVersion rootProject.buildToolsVersion
-    defaultPublishConfig 'debug'
-    publishNonDefault true
 
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion rootProject.targetSdkVersion
-        versionName '0.0.5'
+        versionName '0.0.6-SNAPSHOT'
     }
 
     buildTypes {
@@ -33,36 +31,3 @@ android {
 dependencies {
     implementation "com.android.support:design:${supportVersion}"
 }
-
-android.libraryVariants.all { variant ->
-    renameLibraryVariantOutput(variant)
-
-    def sourcesJarTaskName = "generate${variant.name.capitalize()}SourcesJar"
-
-    task(sourcesJarTaskName, type: Jar) {
-        classifier = 'sources'
-        from variant.sourceSets*.java.srcDirs.flatten()
-        baseName = buildLibraryArchiveBaseName(variant)
-    }
-}
-
-def renameLibraryVariantOutput(variant) {
-    variant.outputs.all { output ->
-        if (outputFileName.endsWith('.aar')) {
-            outputFileName = "${buildLibraryArchiveBaseName(variant)}.aar"
-        }
-    }
-}
-
-def buildLibraryArchiveBaseName(variant) {
-    return "${project.name}_${android.defaultConfig.versionName}_${buildVersionSuffix()}-${variant.baseName}"
-}
-
-def buildVersionSuffix() {
-    if (runningOnJenkins) {
-        return "${System.getenv('BUILD_NUMBER').trim()}_${System.getenv('GIT_COMMIT').subSequence(0, 6).trim()}"
-    }
-    return 'local'
-}
-
-apply from: 'publish.gradle'

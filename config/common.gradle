@@ -1,0 +1,25 @@
+def buildVersionSuffix() {
+    if (runningOnJenkins) {
+        def versionSuffix = System.getenv('VERSION_SUFFIX')?.trim()
+        return "${versionSuffix == null || versionSuffix.empty ? "" : "${versionSuffix}_"}${System.getenv('BUILD_NUMBER')?.trim()}_${System.getenv('GIT_COMMIT')?.subSequence(0, 6)?.trim()}"
+    }
+    return 'local'
+}
+
+def renameLibraryVariantOutput(variant) {
+    variant.outputs.all { output ->
+        if (outputFileName.endsWith('.aar')) {
+            outputFileName = "${buildLibraryArchiveBaseName(variant)}.aar"
+        }
+    }
+}
+
+def buildLibraryArchiveBaseName(variant) {
+    return "${project.name}_${android.defaultConfig.versionName}_${buildVersionSuffix()}-${variant.baseName}"
+}
+
+ext {
+    buildVersionSuffix = this.&buildVersionSuffix
+    renameLibraryVariantOutput = this.&renameLibraryVariantOutput
+    buildLibraryArchiveBaseName = this.&buildLibraryArchiveBaseName
+}
